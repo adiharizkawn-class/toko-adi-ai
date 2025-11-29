@@ -1654,3 +1654,35 @@
     </script>
   </body>
 </html>
+
+<!-- Tambahkan di head -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+  // Konfigurasi Firebase
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    projectId: "YOUR_PROJECT_ID",
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // Ganti fungsi save/load orders
+  function saveOrdersToStorage() {
+    orders.forEach((order) => {
+      db.collection("orders").doc(order.id.toString()).set(order);
+    });
+  }
+
+  function loadOrdersFromStorage() {
+    db.collection("orders")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) => {
+        orders = snapshot.docs.map((doc) => doc.data());
+        if (currentView === "admin") renderOrders();
+        if (currentView === "customer") renderCustomerHistory();
+      });
+  }
+</script>
