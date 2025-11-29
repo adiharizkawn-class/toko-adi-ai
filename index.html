@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Warung Online - Soto, Bakso, Mie Ayam & Kebab</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+    <style>
+      :root {
+        --primary-color: #dc3545;
+        --secondary-color: #fd7e14;
+        --dark-color: #212529;
+        --light-bg: #f8f9fa;
+        --success-color: #28a745;
+        --info-color: #17a2b8;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--light-bg);
+        color: var(--dark-color);
+        line-height: 1.6;
+      }
+
+      /* Animasi */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
+
+      .fade-in {
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      /* Navbar */
+      .navbar {
+        background: linear-gradient(
+          135deg,
+          var(--dark-color) 0%,
+          #343a40 100%
+        ) !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 0.75rem 0;
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+
+      .nav-link {
+        font-weight: 500;
+        margin: 0 0.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .nav-link:hover {
+        color: var(--primary-color) !important;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color) 0%,
+          var(--secondary-color) 100%
+        );
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+      }
+
+      .hero-content h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+
+      .hero-content p {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+
+      /* Cards */
+      .food-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        height: 100%;
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      .food-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .food-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+
+      .food-card-body {
+        padding: 15px;
+      }
+
+      .food-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        color: var(--dark-color);
+      }
+
+      .food-description {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+        min-height: 40px;
+      }
+
+      .food-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
+
+      .price-tag {
+        background: var(--primary-color);
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      .food-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: space-between;
+      }
+
+      /* Buttons */
+      .btn-custom {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 0.9rem;
+      }
+
+      .btn-primary-custom {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .btn-primary-custom:hover {
+        background: #c82333;
+        color: white;
+      }
+
+      .btn-outline-custom {
+        background: transparent;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+      }
+
+      .btn-outline-custom:hover {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      /* Cart */
+      .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: var(--secondary-color);
+        color: white;
+        border-radius: 50%;
+        width: 22px;
+        height: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .cart-sidebar {
+        position: fixed;
+        right: -400px;
+        top: 0;
+        width: 400px;
+        height: 100vh;
+        background: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 1050;
+        overflow-y: auto;
+      }
+
+      .cart-sidebar.show {
+        right: 0;
+      }
+
+      .cart-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1040;
+      }
+
+      .cart-overlay.show {
+        display: block;
+      }
+
+      /* Admin Dashboard */
+      .admin-dashboard {
+        display: none;
+      }
+
+      .stats-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .stats-icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+      }
+
+      .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .order-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--primary-color);
+      }
+
+      .status-badge {
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .status-pending {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .status-processing {
+        background: #d1ecf1;
+        color: #0c5460;
+      }
+
+      .status-ready {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .status-completed {
+        background: #e2e3e5;
+        color: #383d41;
+      }
+
+      /* Login Form */
+      .login-form {
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-control,
+      .form-select {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 10px 15px;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+      }
+
+      /* History Section */
+      .history-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 30px 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .history-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-left: 3px solid var(--primary-color);
+      }
+
+      /* Notification */
+      .notification {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        padding: 12px 20px;
+        background: white;
+        color: var(--dark-color);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1060;
+        display: none;
+        border-left: 4px solid var(--success-color);
+      }
+
+      /* Search and Filter */
+      .search-box {
+        position: relative;
+        margin-bottom: 15px;
+      }
+
+      .search-box input {
+        padding-left: 40px;
+        border-radius: 25px;
+      }
+
+      .search-box i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+      }
+
+      .filter-pills {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+
+      .filter-pill {
+        padding: 6px 15px;
+        border-radius: 15px;
+        background: #e9ecef;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+      }
+
+      .filter-pill.active {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      /* Product Detail Modal */
+      .product-detail-image {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        border-radius: 8px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .cart-sidebar {
+          width: 100%;
+          right: -100%;
+        }
+
+        .hero-section {
+          padding: 40px 0;
+        }
+
+        .hero-content h1 {
+          font-size: 2rem;
+        }
+
+        .hero-content p {
+          font-size: 1rem;
+        }
+
+        .food-card {
+          margin-bottom: 15px;
+        }
+
+        .food-actions {
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        .btn-custom {
+          width: 100%;
+        }
+
+        .nav-link {
+          margin: 0.25rem;
+        }
+
+        .stats-card {
+          margin-bottom: 15px;
+        }
+
+        .order-card {
+          padding: 15px;
+        }
+
+        .history-item {
+          padding: 12px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .food-meta {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .filter-pills {
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Notification -->
+    <div class="notification" id="notification">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span id="notificationText"></span>
+      </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#" id="brandLink">
+          <i class="bi bi-shop me-2"></i>TOKO ADI AI
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#" id="homeLink">Beranda</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="menuLink">Menu</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="historyLink">Riwayat</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="adminLink">Admin</a>
+            </li>
+          </ul>
+          <button class="btn btn-outline-light position-relative" id="cartBtn">
+            <i class="bi bi-cart3 me-1"></i>Keranjang
+            <span class="cart-badge" id="cartBadge">0</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Customer View -->
+    <div id="customerView">
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="container hero-content">
+          <h1 class="fade-in">TOKO ADI AI</h1>
+          <p class="fade-in">
+            Nikmati hidangan lezat Dimsum, Bakso, Mie Ayam, dan Burger Favorit
+            Anda!
+          </p>
+          <div class="fade-in">
+            <button
+              class="btn btn-light btn-lg me-2 mb-2"
+              onclick="document.getElementById('menuSection').scrollIntoView({behavior: 'smooth'})"
+            >
+              <i class="bi bi-arrow-down-circle me-2"></i>Lihat Menu
+            </button>
+            <button
+              class="btn btn-outline-light btn-lg mb-2"
+              onclick="document.getElementById('historySection').scrollIntoView({behavior: 'smooth'})"
+            >
+              <i class="bi bi-clock-history me-2"></i>Riwayat
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu Section -->
+      <section id="menuSection" class="container my-4">
+        <div class="text-center mb-4">
+          <h2 class="fw-bold">Menu Kami</h2>
+          <p class="text-muted">Pilih hidangan favorit Anda</p>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="text-center mb-4">
+          <button
+            class="btn btn-outline-danger category-btn active me-2 mb-2"
+            data-category="all"
+          >
+            <i class="bi bi-grid me-1"></i>Semua
+          </button>
+          <button
+            class="btn btn-outline-danger category-btn me-2 mb-2"
+            data-category="soto"
+          >
+            <i class="bi bi-cup-hot me-1"></i>Dimsum
+          </button>
+          <button
+            class="btn btn-outline-danger category-btn me-2 mb-2"
+            data-category="bakso"
+          >
+            <i class="bi bi-circle me-1"></i>Bakso
+          </button>
+          <button
+            class="btn btn-outline-danger category-btn me-2 mb-2"
+            data-category="mie"
+          >
+            <i class="bi bi-egg-fried me-1"></i>Mie
+          </button>
+          <button
+            class="btn btn-outline-danger category-btn mb-2"
+            data-category="kebab"
+          >
+            <i class="bi bi-geo-alt me-1"></i>Burger
+          </button>
+        </div>
+
+        <!-- Food Grid -->
+        <div class="row" id="foodGrid">
+          <!-- Food items will be dynamically inserted here -->
+        </div>
+      </section>
+
+      <!-- History Section -->
+      <section id="historySection" class="container my-4">
+        <div class="history-section">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold">Riwayat Pesanan</h3>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              onclick="refreshCustomerHistory()"
+            >
+              <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+            </button>
+          </div>
+          <div id="customerHistory">
+            <!-- History items will be dynamically inserted here -->
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Admin Login Form -->
+    <div id="adminLogin" class="container" style="display: none">
+      <div class="login-form">
+        <div class="text-center mb-4">
+          <i
+            class="bi bi-shield-lock"
+            style="font-size: 48px; color: var(--primary-color)"
+          ></i>
+          <h3 class="mt-3">Login Admin</h3>
+          <p class="text-muted">Masuk untuk mengelola pesanan</p>
+        </div>
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              placeholder="Username"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              placeholder="Password"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary-custom w-100">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard container my-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold">Dashboard Admin</h2>
+          <p class="text-muted">Kelola semua pesanan</p>
+        </div>
+        <div>
+          <button class="btn btn-outline-danger me-2" id="refreshBtn">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+          </button>
+          <button class="btn btn-outline-danger" id="logoutBtn">
+            <i class="bi bi-box-arrow-right me-1"></i>Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-icon text-danger">
+              <i class="bi bi-cart-check"></i>
+            </div>
+            <div class="stats-number" id="totalOrders">0</div>
+            <div class="text-muted">Total Pesanan</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-icon text-warning">
+              <i class="bi bi-hourglass-split"></i>
+            </div>
+            <div class="stats-number" id="pendingOrders">0</div>
+            <div class="text-muted">Menunggu</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-icon text-info">
+              <i class="bi bi-gear"></i>
+            </div>
+            <div class="stats-number" id="processingOrders">0</div>
+            <div class="text-muted">Diproses</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stats-card">
+            <div class="stats-icon text-success">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div class="stats-number" id="completedOrders">0</div>
+            <div class="text-muted">Selesai</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Search and Filter -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="searchInput"
+                  placeholder="Cari pesanan..."
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="filter-pills">
+                <div class="filter-pill active" data-filter="all">Semua</div>
+                <div class="filter-pill" data-filter="pending">Menunggu</div>
+                <div class="filter-pill" data-filter="processing">Diproses</div>
+                <div class="filter-pill" data-filter="ready">Siap</div>
+                <div class="filter-pill" data-filter="completed">Selesai</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders List -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0 fw-bold">Daftar Pesanan</h5>
+        </div>
+        <div class="card-body">
+          <div id="ordersList">
+            <!-- Orders will be dynamically inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <div class="cart-sidebar" id="cartSidebar">
+      <div class="p-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0">Keranjang Belanja</h4>
+          <button class="btn-close" id="closeCartBtn"></button>
+        </div>
+        <div id="cartItems">
+          <!-- Cart items will be dynamically inserted here -->
+        </div>
+        <div class="mt-3 pt-3 border-top">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Total:</h5>
+            <h5 class="mb-0 text-danger fw-bold" id="cartTotal">Rp 0</h5>
+          </div>
+          <button class="btn btn-primary-custom w-100" id="checkoutBtn">
+            <i class="bi bi-check-circle me-2"></i>Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="modal fade" id="checkoutModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">Form Checkout</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="checkoutForm">
+              <div class="mb-3">
+                <label for="customerName" class="form-label"
+                  >Nama Lengkap</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="customerName"
+                  placeholder="Nama lengkap"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="customerPhone" class="form-label"
+                  >No. Telepon</label
+                >
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="customerPhone"
+                  placeholder="Nomor telepon"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="customerAddress" class="form-label">Alamat</label>
+                <textarea
+                  class="form-control"
+                  id="customerAddress"
+                  rows="3"
+                  placeholder="Alamat lengkap"
+                  required
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="paymentMethod" class="form-label">Pembayaran</label>
+                <select class="form-select" id="paymentMethod" required>
+                  <option value="">Pilih metode</option>
+                  <option value="cash">Cash</option>
+                  <option value="transfer">Transfer</option>
+                  <option value="ewallet">E-Wallet</option>
+                </select>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary-custom"
+              id="confirmOrderBtn"
+            >
+              <i class="bi bi-check-circle me-2"></i>Konfirmasi
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">Konfirmasi Hapus</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center">
+              <i
+                class="bi bi-exclamation-triangle"
+                style="font-size: 48px; color: var(--primary-color)"
+              ></i>
+              <p class="mt-3">Apakah Anda yakin ingin menghapus pesanan ini?</p>
+              <p class="text-muted">Tindakan ini tidak dapat dibatalkan.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Batal
+            </button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+              <i class="bi bi-trash me-2"></i>Hapus
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Data
+      const foods = [
+        {
+          id: 1,
+          name: "Dimsum",
+          category: "Dimsum",
+          price: 20000,
+          image: "shopping.webp",
+          description: "Dimsum enak poll",
+        },
+        {
+          id: 2,
+          name: "Soto Daging",
+          category: "soto",
+          price: 25000,
+          image: "photo.jpg",
+          description: "Soto daging sapi dengan rempah",
+        },
+        {
+          id: 3,
+          name: "Bakso Urat",
+          category: "bakso",
+          price: 15000,
+          image: "images.jpeg",
+          description: "Bakso urat kenyal",
+        },
+        {
+          id: 4,
+          name: "Bakso Beranak",
+          category: "bakso",
+          price: 20000,
+          image:
+            "e0dec419-e955-47df-bc46-69606aec6577_Go-Biz_20250116_145449.jpeg",
+          description: "Bakso besar berisi telur",
+        },
+        {
+          id: 5,
+          name: "Mie Ayam",
+          category: "mie",
+          price: 18000,
+          image: "hq720.jpg",
+          description: "Mie ayam dengan topping",
+        },
+        {
+          id: 6,
+          name: "Jamur",
+          category: "jamur",
+          price: 17000,
+          image: "5f73528912598.jpg",
+          description: "Mie ayam dengan jamur",
+        },
+        {
+          id: 7,
+          name: "Kebab Turki",
+          category: "kebab",
+          price: 22000,
+          image: "kebab_rumahan_ekonomis.jpg",
+          description: "Kebab dengan daging sapi",
+        },
+        {
+          id: 8,
+          name: "Kebab Keju",
+          category: "kebab",
+          price: 25000,
+          image:
+            "e362433d-0a5f-42f9-8abc-b990bd5c0f41_Go-Biz_20210423_170729.webp",
+          description: "Kebab dengan keju mozarella",
+        },
+      ];
+
+      let cart = [];
+      let orders = [];
+      let currentView = "customer";
+      let isLoggedIn = false;
+      let orderToDelete = null;
+      let currentFilter = "all";
+      let searchTerm = "";
+
+      // Initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        loadOrdersFromStorage();
+        renderFoods("all");
+        updateCartBadge();
+        renderCustomerHistory();
+        setupEventListeners();
+      });
+
+      // Load orders from localStorage
+      function loadOrdersFromStorage() {
+        const storedOrders = localStorage.getItem("warungOnlineOrders");
+        if (storedOrders) {
+          orders = JSON.parse(storedOrders);
+        }
+      }
+
+      // Save orders to localStorage
+      function saveOrdersToStorage() {
+        localStorage.setItem("warungOnlineOrders", JSON.stringify(orders));
+      }
+
+      // Event Listeners
+      function setupEventListeners() {
+        // Navigation
+        document
+          .getElementById("homeLink")
+          .addEventListener("click", showCustomerView);
+        document.getElementById("menuLink").addEventListener("click", () => {
+          showCustomerView();
+          document
+            .getElementById("menuSection")
+            .scrollIntoView({ behavior: "smooth" });
+        });
+        document.getElementById("historyLink").addEventListener("click", () => {
+          showCustomerView();
+          document
+            .getElementById("historySection")
+            .scrollIntoView({ behavior: "smooth" });
+        });
+        document
+          .getElementById("adminLink")
+          .addEventListener("click", showAdminLogin);
+        document
+          .getElementById("brandLink")
+          .addEventListener("click", showCustomerView);
+
+        // Cart
+        document.getElementById("cartBtn").addEventListener("click", showCart);
+        document
+          .getElementById("closeCartBtn")
+          .addEventListener("click", hideCart);
+        document
+          .getElementById("cartOverlay")
+          .addEventListener("click", hideCart);
+        document
+          .getElementById("checkoutBtn")
+          .addEventListener("click", showCheckoutModal);
+
+        // Category filter
+        document.querySelectorAll(".category-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            document
+              .querySelectorAll(".category-btn")
+              .forEach((b) => b.classList.remove("active"));
+            this.classList.add("active");
+            renderFoods(this.dataset.category);
+          });
+        });
+
+        // Admin
+        document
+          .getElementById("loginForm")
+          .addEventListener("submit", handleLogin);
+        document
+          .getElementById("logoutBtn")
+          .addEventListener("click", handleLogout);
+        document
+          .getElementById("refreshBtn")
+          .addEventListener("click", refreshOrders);
+
+        // Search and filter
+        document
+          .getElementById("searchInput")
+          .addEventListener("input", function (e) {
+            searchTerm = e.target.value.toLowerCase();
+            renderOrders();
+          });
+
+        document.querySelectorAll(".filter-pill").forEach((pill) => {
+          pill.addEventListener("click", function () {
+            document
+              .querySelectorAll(".filter-pill")
+              .forEach((p) => p.classList.remove("active"));
+            this.classList.add("active");
+            currentFilter = this.dataset.filter;
+            renderOrders();
+          });
+        });
+
+        // Checkout
+        document
+          .getElementById("confirmOrderBtn")
+          .addEventListener("click", handleCheckout);
+
+        // Delete confirmation
+        document
+          .getElementById("confirmDeleteBtn")
+          .addEventListener("click", confirmDeleteOrder);
+      }
+
+      // Render Functions
+      function renderFoods(category) {
+        const foodGrid = document.getElementById("foodGrid");
+        const filteredFoods =
+          category === "all"
+            ? foods
+            : foods.filter((f) => f.category === category);
+
+        foodGrid.innerHTML = filteredFoods
+          .map(
+            (food) => `
+                <div class="col-md-6 col-lg-3">
+                    <div class="food-card">
+                        <img src="${food.image}" class="food-image" alt="${
+              food.name
+            }">
+                        <div class="food-card-body">
+                            <h5 class="food-title">${food.name}</h5>
+                            <p class="food-description">${food.description}</p>
+                            <div class="food-meta">
+                                <span class="price-tag">Rp ${food.price.toLocaleString(
+                                  "id-ID"
+                                )}</span>
+                            </div>
+                            <div class="food-actions">
+                                <button class="btn btn-outline-custom btn-custom" onclick="showProductDetail(${
+                                  food.id
+                                })">
+                                    <i class="bi bi-info-circle me-1"></i>Detail
+                                </button>
+                                <button class="btn btn-primary-custom btn-custom" onclick="addToCart(${
+                                  food.id
+                                })">
+                                    <i class="bi bi-cart-plus me-1"></i>Tambah
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function renderCart() {
+        const cartItems = document.getElementById("cartItems");
+        const cartTotal = document.getElementById("cartTotal");
+
+        if (cart.length === 0) {
+          cartItems.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-cart-x" style="font-size: 48px; color: #dee2e6;"></i>
+                        <p class="mt-2 text-muted">Keranjang kosong</p>
+                    </div>
+                `;
+          cartTotal.textContent = "Rp 0";
+          return;
+        }
+
+        cartItems.innerHTML = cart
+          .map(
+            (item) => `
+                <div class="card mb-2">
+                    <div class="card-body p-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">${item.name}</h6>
+                                <small class="text-muted">Rp ${item.price.toLocaleString(
+                                  "id-ID"
+                                )} x ${item.quantity}</small>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-danger" onclick="updateQuantity(${
+                                  item.id
+                                }, -1)">
+                                    <i class="bi bi-dash"></i>
+                                </button>
+                                <span class="mx-2 fw-bold">${
+                                  item.quantity
+                                }</span>
+                                <button class="btn btn-sm btn-outline-danger" onclick="updateQuantity(${
+                                  item.id
+                                }, 1)">
+                                    <i class="bi bi-plus"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger ms-2" onclick="removeFromCart(${
+                                  item.id
+                                })">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        cartTotal.textContent = `Rp ${total.toLocaleString("id-ID")}`;
+      }
+
+      function renderOrders() {
+        const ordersList = document.getElementById("ordersList");
+
+        let filteredOrders = orders;
+
+        if (currentFilter !== "all") {
+          filteredOrders = filteredOrders.filter(
+            (order) => order.status === currentFilter
+          );
+        }
+
+        if (searchTerm) {
+          filteredOrders = filteredOrders.filter(
+            (order) =>
+              order.customerName.toLowerCase().includes(searchTerm) ||
+              order.customerPhone.includes(searchTerm) ||
+              order.items.some((item) =>
+                item.name.toLowerCase().includes(searchTerm)
+              )
+          );
+        }
+
+        if (filteredOrders.length === 0) {
+          ordersList.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-inbox" style="font-size: 48px; color: #dee2e6;"></i>
+                        <p class="mt-2 text-muted">Tidak ada pesanan</p>
+                    </div>
+                `;
+          updateStatistics();
+          return;
+        }
+
+        ordersList.innerHTML = filteredOrders
+          .map(
+            (order) => `
+                <div class="order-card">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="fw-bold mb-1">Order #${
+                                      order.id
+                                    }</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock me-1"></i>
+                                        ${new Date(
+                                          order.timestamp
+                                        ).toLocaleString("id-ID")}
+                                    </small>
+                                </div>
+                                <span class="status-badge status-${
+                                  order.status
+                                }">${getStatusText(order.status)}</span>
+                            </div>
+                            <div class="mb-2">
+                                <p class="mb-1"><strong>Pelanggan:</strong> ${
+                                  order.customerName
+                                }</p>
+                                <p class="mb-1"><strong>Telepon:</strong> ${
+                                  order.customerPhone
+                                }</p>
+                                <p class="mb-1"><strong>Alamat:</strong> ${
+                                  order.customerAddress
+                                }</p>
+                                <p class="mb-1"><strong>Pembayaran:</strong> ${
+                                  order.paymentMethod
+                                }</p>
+                            </div>
+                            <div>
+                                <strong class="d-block mb-1">Items:</strong>
+                                <div class="row g-1">
+                                    ${order.items
+                                      .map(
+                                        (item) => `
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center bg-light p-2 rounded">
+                                                <span>${item.name} x${
+                                          item.quantity
+                                        }</span>
+                                                <span class="fw-bold">Rp ${(
+                                                  item.price * item.quantity
+                                                ).toLocaleString(
+                                                  "id-ID"
+                                                )}</span>
+                                            </div>
+                                        </div>
+                                    `
+                                      )
+                                      .join("")}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <h5 class="text-danger fw-bold mb-2">Rp ${order.total.toLocaleString(
+                              "id-ID"
+                            )}</h5>
+                            <div class="d-grid gap-1">
+                                ${
+                                  order.status !== "completed"
+                                    ? `
+                                    <select class="form-select form-select-sm" onchange="updateOrderStatus(${
+                                      order.id
+                                    }, this.value)">
+                                        <option value="pending" ${
+                                          order.status === "pending"
+                                            ? "selected"
+                                            : ""
+                                        }>Menunggu</option>
+                                        <option value="processing" ${
+                                          order.status === "processing"
+                                            ? "selected"
+                                            : ""
+                                        }>Diproses</option>
+                                        <option value="ready" ${
+                                          order.status === "ready"
+                                            ? "selected"
+                                            : ""
+                                        }>Siap</option>
+                                        <option value="completed" ${
+                                          order.status === "completed"
+                                            ? "selected"
+                                            : ""
+                                        }>Selesai</option>
+                                    </select>
+                                `
+                                    : `
+                                    <button class="btn btn-danger btn-sm w-100" onclick="showDeleteConfirmation(${order.id})">
+                                        <i class="bi bi-trash me-1"></i>Hapus
+                                    </button>
+                                `
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+
+        updateStatistics();
+      }
+
+      function renderCustomerHistory() {
+        const historyContainer = document.getElementById("customerHistory");
+
+        if (orders.length === 0) {
+          historyContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-clock-history" style="font-size: 48px; color: #dee2e6;"></i>
+                        <p class="mt-2 text-muted">Belum ada riwayat</p>
+                    </div>
+                `;
+          return;
+        }
+
+        historyContainer.innerHTML = orders
+          .map(
+            (order) => `
+                <div class="history-item">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold mb-0">Order #${order.id}</h6>
+                                <span class="status-badge status-${
+                                  order.status
+                                }">${getStatusText(order.status)}</span>
+                            </div>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-clock me-1"></i>
+                                ${new Date(order.timestamp).toLocaleString(
+                                  "id-ID"
+                                )}
+                            </p>
+                            <div class="mb-2">
+                                <strong>Items:</strong>
+                                <span class="ms-2">${order.items
+                                  .map(
+                                    (item) => `${item.name} x${item.quantity}`
+                                  )
+                                  .join(", ")}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <h5 class="text-danger fw-bold mb-0">Rp ${order.total.toLocaleString(
+                              "id-ID"
+                            )}</h5>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      function updateStatistics() {
+        const totalOrders = orders.length;
+        const pendingOrders = orders.filter(
+          (o) => o.status === "pending"
+        ).length;
+        const processingOrders = orders.filter(
+          (o) => o.status === "processing"
+        ).length;
+        const completedOrders = orders.filter(
+          (o) => o.status === "completed"
+        ).length;
+
+        document.getElementById("totalOrders").textContent = totalOrders;
+        document.getElementById("pendingOrders").textContent = pendingOrders;
+        document.getElementById("processingOrders").textContent =
+          processingOrders;
+        document.getElementById("completedOrders").textContent =
+          completedOrders;
+      }
+
+      function showProductDetail(foodId) {
+        const food = foods.find((f) => f.id === foodId);
+        if (food) {
+          alert(
+            `Detail Produk:\n\nNama: ${
+              food.name
+            }\nHarga: Rp ${food.price.toLocaleString("id-ID")}\nDeskripsi: ${
+              food.description
+            }`
+          );
+        }
+      }
+
+      // Cart Functions
+      function addToCart(foodId) {
+        const food = foods.find((f) => f.id === foodId);
+        const existingItem = cart.find((item) => item.id === foodId);
+
+        if (existingItem) {
+          existingItem.quantity++;
+        } else {
+          cart.push({ ...food, quantity: 1 });
+        }
+
+        updateCartBadge();
+        renderCart();
+        showCart();
+        showNotification(`${food.name} ditambahkan`, "success");
+      }
+
+      function updateQuantity(foodId, change) {
+        const item = cart.find((item) => item.id === foodId);
+        if (item) {
+          item.quantity += change;
+          if (item.quantity <= 0) {
+            removeFromCart(foodId);
+          } else {
+            updateCartBadge();
+            renderCart();
+          }
+        }
+      }
+
+      function removeFromCart(foodId) {
+        const item = cart.find((item) => item.id === foodId);
+        cart = cart.filter((item) => item.id !== foodId);
+        updateCartBadge();
+        renderCart();
+        showNotification(`${item.name} dihapus`, "warning");
+      }
+
+      function updateCartBadge() {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById("cartBadge").textContent = totalItems;
+      }
+
+      function showCart() {
+        renderCart();
+        document.getElementById("cartSidebar").classList.add("show");
+        document.getElementById("cartOverlay").classList.add("show");
+      }
+
+      function hideCart() {
+        document.getElementById("cartSidebar").classList.remove("show");
+        document.getElementById("cartOverlay").classList.remove("show");
+      }
+
+      function showCheckoutModal() {
+        if (cart.length === 0) {
+          showNotification("Keranjang kosong!", "warning");
+          return;
+        }
+        const modal = new bootstrap.Modal(
+          document.getElementById("checkoutModal")
+        );
+        modal.show();
+      }
+
+      function handleCheckout() {
+        const form = document.getElementById("checkoutForm");
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        const order = {
+          id: Date.now(),
+          customerName: document.getElementById("customerName").value,
+          customerPhone: document.getElementById("customerPhone").value,
+          customerAddress: document.getElementById("customerAddress").value,
+          paymentMethod: document.getElementById("paymentMethod").value,
+          items: [...cart],
+          total: cart.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          ),
+          status: "pending",
+          timestamp: new Date().toISOString(),
+        };
+
+        orders.unshift(order);
+        saveOrdersToStorage();
+
+        cart = [];
+        updateCartBadge();
+        hideCart();
+
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("checkoutModal")
+        );
+        modal.hide();
+
+        form.reset();
+        showNotification("Pesanan berhasil!", "success");
+        renderCustomerHistory();
+      }
+
+      // View Functions
+      function showCustomerView() {
+        currentView = "customer";
+        document.getElementById("customerView").style.display = "block";
+        document.getElementById("adminLogin").style.display = "none";
+        document.getElementById("adminDashboard").style.display = "none";
+      }
+
+      function showAdminLogin() {
+        currentView = "login";
+        document.getElementById("customerView").style.display = "none";
+        document.getElementById("adminLogin").style.display = "block";
+        document.getElementById("adminDashboard").style.display = "none";
+      }
+
+      function showAdminDashboard() {
+        currentView = "admin";
+        document.getElementById("customerView").style.display = "none";
+        document.getElementById("adminLogin").style.display = "none";
+        document.getElementById("adminDashboard").style.display = "block";
+
+        loadOrdersFromStorage();
+        renderOrders();
+      }
+
+      // Admin Functions
+      function handleLogin(e) {
+        e.preventDefault();
+        const username = document.getElementById("username").value;
+        const password = document.getElementById("password").value;
+
+        if (username === "admin" && password === "admin123") {
+          isLoggedIn = true;
+          showAdminDashboard();
+          showNotification("Login berhasil!", "success");
+        } else {
+          showNotification("Username/password salah!", "danger");
+        }
+      }
+
+      function handleLogout() {
+        isLoggedIn = false;
+        showCustomerView();
+        showNotification("Logout berhasil!", "info");
+      }
+
+      function refreshOrders() {
+        loadOrdersFromStorage();
+        renderOrders();
+        showNotification("Data diperbarui!", "info");
+      }
+
+      function refreshCustomerHistory() {
+        loadOrdersFromStorage();
+        renderCustomerHistory();
+        showNotification("Riwayat diperbarui!", "info");
+      }
+
+      function updateOrderStatus(orderId, newStatus) {
+        const order = orders.find((o) => o.id === orderId);
+        if (order) {
+          order.status = newStatus;
+          saveOrdersToStorage();
+          renderOrders();
+          renderCustomerHistory();
+          showNotification("Status diperbarui!", "success");
+        }
+      }
+
+      function getStatusText(status) {
+        const statusMap = {
+          pending: "Menunggu",
+          processing: "Diproses",
+          ready: "Siap",
+          completed: "Selesai",
+        };
+        return statusMap[status] || status;
+      }
+
+      // Delete order functions
+      function showDeleteConfirmation(orderId) {
+        orderToDelete = orderId;
+        const modal = new bootstrap.Modal(
+          document.getElementById("deleteModal")
+        );
+        modal.show();
+      }
+
+      function confirmDeleteOrder() {
+        if (orderToDelete) {
+          orders = orders.filter((order) => order.id !== orderToDelete);
+          saveOrdersToStorage();
+          renderOrders();
+          renderCustomerHistory();
+          showNotification("Pesanan dihapus!", "success");
+
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("deleteModal")
+          );
+          modal.hide();
+
+          orderToDelete = null;
+        }
+      }
+
+      // Notification function
+      function showNotification(message, type = "info") {
+        const notification = document.getElementById("notification");
+        const notificationText = document.getElementById("notificationText");
+
+        notificationText.textContent = message;
+        notification.className = "notification";
+
+        const colors = {
+          success: "#28a745",
+          warning: "#ffc107",
+          danger: "#dc3545",
+          info: "#17a2b8",
+        };
+
+        notification.style.borderLeftColor = colors[type] || colors.info;
+        notification.style.display = "block";
+
+        setTimeout(() => {
+          notification.style.display = "none";
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>
