@@ -389,7 +389,7 @@
         z-index: 1070;
         display: none;
         max-width: 350px;
-        animation: slideIn 0.5s ease, pulse 2s infinite;
+        animation: slideIn 0.5s ease;
       }
 
       @keyframes slideIn {
@@ -413,7 +413,7 @@
         padding: 8px 15px;
         border-radius: 20px;
         font-size: 0.8rem;
-        display: flex;
+        display: none;
         align-items: center;
         z-index: 1030;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -1361,7 +1361,6 @@
       let currentFilter = "all";
       let searchTerm = "";
       let lastNotifiedOrders = new Set(); // Track orders that have been notified
-      let lastUpdateTime = 0; // Track last update time for real-time sync
 
       // Initialize
       document.addEventListener("DOMContentLoaded", function () {
@@ -1372,8 +1371,8 @@
         // Auto save every 5 seconds
         setInterval(autoSave, 5000);
 
-        // Check for order status updates every 2 seconds for real-time updates
-        setInterval(checkOrderStatusUpdates, 2000);
+        // Check for order status updates every 1 second for real-time updates
+        setInterval(checkOrderStatusUpdates, 1000);
 
         // Setup localStorage event listener for cross-tab real-time updates
         setupLocalStorageListener();
@@ -1387,6 +1386,7 @@
         // Listen for storage events (when localStorage changes in another tab/window)
         window.addEventListener("storage", function (event) {
           if (event.key === "warungOnlineOrders") {
+            console.log("Storage event detected, reloading orders...");
             // Orders data has been updated in another tab/window
             loadOrders();
 
@@ -1397,7 +1397,7 @@
               renderCustomerHistory();
             }
 
-            // Check for order status updates
+            // Check for order status updates immediately
             checkOrderStatusUpdates();
           }
         });
@@ -1469,6 +1469,7 @@
         customerOrders.forEach((order) => {
           // Check if order is ready and hasn't been notified yet
           if (order.status === "ready" && !lastNotifiedOrders.has(order.id)) {
+            console.log("Order ready detected:", order.id);
             showOrderReadyNotification(order);
             lastNotifiedOrders.add(order.id);
 
@@ -1544,12 +1545,11 @@
           localStorage.setItem("warungOnlineOrders", JSON.stringify(orders));
           updateLastSyncTime();
 
-          // Set timestamp for real-time updates
-          lastUpdateTime = Date.now();
-          localStorage.setItem(
-            "warungOnlineLastUpdate",
-            lastUpdateTime.toString()
-          );
+          // Force storage event for cross-tab communication
+          // This is a workaround to trigger storage event in the same tab
+          const tempKey = "warungOnlineOrders_temp";
+          localStorage.setItem(tempKey, Date.now().toString());
+          localStorage.removeItem(tempKey);
         } catch (error) {
           console.error("Error saving orders:", error);
           showNotification("Gagal menyimpan data", "danger");
@@ -1561,12 +1561,7 @@
           const storedOrders = localStorage.getItem("warungOnlineOrders");
           if (storedOrders) {
             orders = JSON.parse(storedOrders);
-          }
-
-          // Get last update time
-          const lastUpdate = localStorage.getItem("warungOnlineLastUpdate");
-          if (lastUpdate) {
-            lastUpdateTime = parseInt(lastUpdate);
+            console.log("Orders loaded:", orders.length);
           }
         } catch (error) {
           console.error("Error loading orders:", error);
@@ -2503,11 +2498,9 @@
           renderCustomerHistory();
           showNotification("Status pesanan diperbarui!", "success");
 
-          // If status changed to "ready", show notification to customer
-          if (newStatus === "ready" && oldStatus !== "ready") {
-            // This will be picked up by the checkOrderStatusUpdates function
-            // on the customer's device through real-time updates
-          }
+          console.log(
+            `Order ${orderId} status changed from ${oldStatus} to ${newStatus}`
+          );
         }
       }
 
