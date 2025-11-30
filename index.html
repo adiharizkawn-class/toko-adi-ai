@@ -2562,6 +2562,194 @@
           notification.style.display = "none";
         }, 3000);
       }
+
+      // Ganti fungsi setupLocalStorageListener yang ada dengan ini
+      function setupLocalStorageListener() {
+        // Buat custom event untuk notifikasi real-time
+        window.addEventListener("storage", function (event) {
+          if (event.key === "warungOnlineOrders") {
+            console.log("Perubahan data terdeteksi, memperbarui tampilan...");
+            loadOrders();
+
+            // Update UI berdasarkan view saat ini
+            if (currentView === "admin") {
+              renderOrders();
+            } else if (currentView === "customer") {
+              renderCustomerHistory();
+            }
+
+            // Periksa update status pesanan segera
+            checkOrderStatusUpdates();
+          }
+
+          // Deteksi perubahan status pesanan
+          if (event.key === "warungOrderStatusUpdate") {
+            try {
+              const statusUpdate = JSON.parse(event.newValue);
+              console.log("Update status pesanan terdeteksi:", statusUpdate);
+
+              // Muat ulang data dan periksa notifikasi
+              loadOrders();
+              checkOrderStatusUpdates();
+            } catch (error) {
+              console.error("Error parsing status update:", error);
+            }
+          }
+        });
+      }
+
+      // Ganti fungsi updateOrderStatus yang ada dengan ini
+      function updateOrderStatus(orderId, newStatus) {
+        const order = orders.find((o) => o.id === orderId);
+        if (order) {
+          const oldStatus = order.status;
+          order.status = newStatus;
+          saveOrders();
+          renderOrders();
+          renderCustomerHistory();
+          showNotification("Status pesanan diperbarui!", "success");
+
+          console.log(
+            `Pesanan #${orderId} berubah dari ${oldStatus} ke ${newStatus}`
+          );
+
+          // Jika status berubah menjadi 'ready', kirim notifikasi real-time
+          if (newStatus === "ready") {
+            // Simpan update status ke localStorage khusus
+            localStorage.setItem(
+              "warungOrderStatusUpdate",
+              JSON.stringify({
+                orderId: orderId,
+                status: newStatus,
+                timestamp: new Date().toISOString(),
+                customerName: order.customerName,
+              })
+            );
+
+            // Hapus setelah disimpan untuk memicu event storage
+            setTimeout(() => {
+              localStorage.removeItem("warungOrderStatusUpdate");
+            }, 100);
+          }
+        }
+      }
+
+      // Ganti fungsi checkOrderStatusUpdates yang ada dengan ini
+      function checkOrderStatusUpdates() {
+        if (!currentUser || currentUser.isAdmin) return;
+
+        // Muat ulang pesanan terbaru dari localStorage
+        loadOrders();
+
+        const customerOrders = orders.filter(
+          (order) => order.customerId === currentUser.id
+        );
+
+        customerOrders.forEach((order) => {
+          // Cek apakah pesanan sudah siap dan belum diberi notifikasi
+          if (order.status === "ready" && !lastNotifiedOrders.has(order.id)) {
+            console.log("Pesanan siap terdeteksi:", order.id);
+            showOrderReadyNotification(order);
+            lastNotifiedOrders.add(order.id);
+
+            // Simpan set pesanan yang sudah diberi notifikasi ke localStorage
+            localStorage.setItem(
+              "warungOnlineNotifiedOrders",
+              JSON.stringify([...lastNotifiedOrders])
+            );
+
+            // Highlight pesanan di riwayat
+            highlightOrderInHistory(order.id);
+          }
+        });
+      }
+
+      // Tambahkan fungsi ini untuk memuat notifikasi yang sudah dikirim
+      function loadNotifiedOrders() {
+        try {
+          const notifiedOrders = localStorage.getItem(
+            "warungOnlineNotifiedOrders"
+          );
+          if (notifiedOrders) {
+            lastNotifiedOrders = new Set(JSON.parse(notifiedOrders));
+          }
+        } catch (error) {
+          console.error("Error loading notified orders:", error);
+          lastNotifiedOrders = new Set();
+        }
+      }
+
+      // Perbaiki fungsi saveOrders
+      function saveOrders() {
+        try {
+          localStorage.setItem("warungOnlineOrders", JSON.stringify(orders));
+          updateLastSyncTime();
+
+          // Trigger storage event dengan menulis ke kunci sementara
+          const tempKey = "warungOnlineOrders_" + Date.now();
+          localStorage.setItem(tempKey, "refresh");
+          localStorage.removeItem(tempKey);
+
+          console.log("Data pesanan tersimpan:", orders.length);
+        } catch (error) {
+          console.error("Error saving orders:", error);
+          showNotification("Gagal menyimpan data", "danger");
+        }
+      }
+
+      // Perbaiki fungsi loadOrders
+      function loadOrders() {
+        try {
+          const storedOrders = localStorage.getItem("warungOnlineOrders");
+          if (storedOrders) {
+            orders = JSON.parse(storedOrders);
+            console.log("Data pesanan dimuat:", orders.length);
+          }
+        } catch (error) {
+          console.error("Error loading orders:", error);
+          orders = [];
+        }
+      }
+
+      // Perbaiki fungsi initialize
+      document.addEventListener("DOMContentLoaded", function () {
+        checkURLParams();
+        loadOrders();
+        loadNotifiedOrders(); // Tambahkan ini
+        setupEventListeners();
+
+        // Auto save setiap 5 detik
+        setInterval(autoSave, 5000);
+
+        // Check for order status updates setiap 1 detik
+        setInterval(checkOrderStatusUpdates, 1000);
+
+        // Setup localStorage event listener
+        setupLocalStorageListener();
+
+        // Check if user is already logged in
+        checkExistingLogin();
+      });
+
+      // Perbaiki fungsi customerLogout dan handleLogout
+      function customerLogout() {
+        currentUser = null;
+        lastNotifiedOrders.clear();
+        localStorage.removeItem("warungOnlineUser");
+        localStorage.removeItem("warungOnlineNotifiedOrders");
+        showCustomerLogin();
+        showNotification("Logout berhasil!", "info");
+      }
+
+      function handleLogout() {
+        currentUser = null;
+        isAdmin = false;
+        lastNotifiedOrders.clear();
+        localStorage.removeItem("warungOnlineUser");
+        localStorage.removeItem("warungOnlineNotifiedOrders");
+        showCustomerLogin();
+        showNotification("Logout berhasil!", "info");
+      }
     </script>
   </body>
 </html>
