@@ -2752,6 +2752,120 @@
         showCustomerLogin();
         showNotification("Logout berhasil!", "info");
       }
+
+      // Tambahkan fungsi ini untuk memaksa refresh data
+      function forceRefreshData() {
+        console.log("Memaksa refresh data...");
+        loadOrders();
+
+        if (currentView === "admin") {
+          renderOrders();
+        } else if (currentView === "customer") {
+          renderCustomerHistory();
+        }
+
+        // Periksa update status pesanan
+        checkOrderStatusUpdates();
+
+        showNotification("Data berhasil diperbarui!", "success");
+      }
+
+      // Perbaiki fungsi importFromCode
+      function importFromCode() {
+        const importCode = document.getElementById("importCode").value.trim();
+
+        if (!importCode) {
+          showNotification("Masukkan sync code terlebih dahulu", "warning");
+          return;
+        }
+
+        try {
+          const decodedData = atob(importCode);
+          const importedData = JSON.parse(decodedData);
+
+          if (importedData.orders && Array.isArray(importedData.orders)) {
+            let importedCount = 0;
+
+            // Merge orders, avoid duplicates
+            importedData.orders.forEach((newOrder) => {
+              const exists = orders.find((order) => order.id === newOrder.id);
+              if (!exists) {
+                orders.push(newOrder);
+                importedCount++;
+              }
+            });
+
+            if (importedCount > 0) {
+              saveOrders();
+
+              // Paksa refresh data setelah import
+              forceRefreshData();
+
+              showNotification(
+                `Berhasil mengimpor ${importedCount} pesanan!`,
+                "success"
+              );
+              updateSyncStats();
+            } else {
+              showNotification("Tidak ada data baru yang diimpor", "info");
+            }
+          } else {
+            showNotification("Format data tidak valid", "danger");
+          }
+        } catch (error) {
+          showNotification("Sync code tidak valid", "danger");
+          console.error("Import error:", error);
+        }
+      }
+
+      // Perbaiki fungsi importFromFile
+      function importFromFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const importedData = JSON.parse(e.target.result);
+
+            if (importedData.orders && Array.isArray(importedData.orders)) {
+              let importedCount = 0;
+
+              // Merge orders, avoid duplicates
+              importedData.orders.forEach((newOrder) => {
+                const exists = orders.find((order) => order.id === newOrder.id);
+                if (!exists) {
+                  orders.push(newOrder);
+                  importedCount++;
+                }
+              });
+
+              if (importedCount > 0) {
+                saveOrders();
+
+                // Paksa refresh data setelah import
+                forceRefreshData();
+
+                showNotification(
+                  `Berhasil mengimpor ${importedCount} pesanan dari file!`,
+                  "success"
+                );
+                updateSyncStats();
+              } else {
+                showNotification("Tidak ada data baru yang diimpor", "info");
+              }
+            } else {
+              showNotification("Format file tidak valid", "danger");
+            }
+          } catch (error) {
+            showNotification("Gagal membaca file", "danger");
+            console.error("File import error:", error);
+          }
+        };
+        reader.readAsText(file);
+        // Reset file input
+        event.target.value = "";
+      }
     </script>
   </body>
 </html>
