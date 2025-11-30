@@ -403,6 +403,37 @@
         }
       }
 
+      /* Real-time Status Indicator */
+      .realtime-indicator {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(40, 167, 69, 0.9);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        z-index: 1030;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .realtime-indicator i {
+        margin-right: 5px;
+        animation: blink 1.5s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
       /* Sync Modal */
       .sync-modal .modal-body {
         max-height: 70vh;
@@ -564,6 +595,13 @@
           left: 10px;
           max-width: none;
         }
+
+        .realtime-indicator {
+          bottom: 10px;
+          right: 10px;
+          font-size: 0.7rem;
+          padding: 6px 12px;
+        }
       }
 
       @media (max-width: 576px) {
@@ -600,6 +638,12 @@
           </p>
         </div>
       </div>
+    </div>
+
+    <!-- Real-time Status Indicator -->
+    <div class="realtime-indicator" id="realtimeIndicator">
+      <i class="bi bi-wifi"></i>
+      <span>Real-time Aktif</span>
     </div>
 
     <!-- Navbar -->
@@ -1243,18 +1287,18 @@
       const foods = [
         {
           id: 1,
-          name: "Dimsun Mentai",
-          category: "Dimsum",
+          name: "Soto Ayam",
+          category: "soto",
           price: 20000,
-          image: "shopping.webp",
-          description: "dimsum dengan kuah gurih",
+          image: "https://picsum.photos/seed/soto1/300/200",
+          description: "Soto ayam dengan kuah gurih",
         },
         {
           id: 2,
           name: "Soto Daging",
           category: "soto",
           price: 25000,
-          image: "photo.jpg",
+          image: "https://picsum.photos/seed/soto2/300/200",
           description: "Soto daging sapi dengan rempah",
         },
         {
@@ -1262,7 +1306,7 @@
           name: "Bakso Urat",
           category: "bakso",
           price: 15000,
-          image: "images.jpeg",
+          image: "https://picsum.photos/seed/bakso1/300/200",
           description: "Bakso urat kenyal",
         },
         {
@@ -1270,8 +1314,7 @@
           name: "Bakso Beranak",
           category: "bakso",
           price: 20000,
-          image:
-            "e0dec419-e955-47df-bc46-69606aec6577_Go-Biz_20250116_145449.jpeg",
+          image: "https://picsum.photos/seed/bakso2/300/200",
           description: "Bakso besar berisi telur",
         },
         {
@@ -1279,15 +1322,15 @@
           name: "Mie Ayam",
           category: "mie",
           price: 18000,
-          image: "hq720.jpg",
+          image: "https://picsum.photos/seed/mie1/300/200",
           description: "Mie ayam dengan topping",
         },
         {
           id: 6,
-          name: " Jamur",
-          category: "jamur",
+          name: "Mie Jamur",
+          category: "mie",
           price: 17000,
-          image: "5f73528912598.jpg",
+          image: "https://picsum.photos/seed/mie2/300/200",
           description: "Mie ayam dengan jamur",
         },
         {
@@ -1295,7 +1338,7 @@
           name: "Kebab Turki",
           category: "kebab",
           price: 22000,
-          image: "kebab_rumahan_ekonomis.jpg",
+          image: "https://picsum.photos/seed/kebab1/300/200",
           description: "Kebab dengan daging sapi",
         },
         {
@@ -1303,8 +1346,7 @@
           name: "Kebab Keju",
           category: "kebab",
           price: 25000,
-          image:
-            "e362433d-0a5f-42f9-8abc-b990bd5c0f41_Go-Biz_20210423_170729.webp",
+          image: "https://picsum.photos/seed/kebab2/300/200",
           description: "Kebab dengan keju mozarella",
         },
       ];
@@ -1319,6 +1361,7 @@
       let currentFilter = "all";
       let searchTerm = "";
       let lastNotifiedOrders = new Set(); // Track orders that have been notified
+      let lastUpdateTime = 0; // Track last update time for real-time sync
 
       // Initialize
       document.addEventListener("DOMContentLoaded", function () {
@@ -1329,12 +1372,36 @@
         // Auto save every 5 seconds
         setInterval(autoSave, 5000);
 
-        // Check for order status updates every 3 seconds
-        setInterval(checkOrderStatusUpdates, 3000);
+        // Check for order status updates every 2 seconds for real-time updates
+        setInterval(checkOrderStatusUpdates, 2000);
+
+        // Setup localStorage event listener for cross-tab real-time updates
+        setupLocalStorageListener();
 
         // Check if user is already logged in
         checkExistingLogin();
       });
+
+      // Setup localStorage event listener for real-time updates
+      function setupLocalStorageListener() {
+        // Listen for storage events (when localStorage changes in another tab/window)
+        window.addEventListener("storage", function (event) {
+          if (event.key === "warungOnlineOrders") {
+            // Orders data has been updated in another tab/window
+            loadOrders();
+
+            // Update UI based on current view
+            if (currentView === "admin") {
+              renderOrders();
+            } else if (currentView === "customer") {
+              renderCustomerHistory();
+            }
+
+            // Check for order status updates
+            checkOrderStatusUpdates();
+          }
+        });
+      }
 
       // Check existing login
       function checkExistingLogin() {
@@ -1476,6 +1543,13 @@
         try {
           localStorage.setItem("warungOnlineOrders", JSON.stringify(orders));
           updateLastSyncTime();
+
+          // Set timestamp for real-time updates
+          lastUpdateTime = Date.now();
+          localStorage.setItem(
+            "warungOnlineLastUpdate",
+            lastUpdateTime.toString()
+          );
         } catch (error) {
           console.error("Error saving orders:", error);
           showNotification("Gagal menyimpan data", "danger");
@@ -1487,6 +1561,12 @@
           const storedOrders = localStorage.getItem("warungOnlineOrders");
           if (storedOrders) {
             orders = JSON.parse(storedOrders);
+          }
+
+          // Get last update time
+          const lastUpdate = localStorage.getItem("warungOnlineLastUpdate");
+          if (lastUpdate) {
+            lastUpdateTime = parseInt(lastUpdate);
           }
         } catch (error) {
           console.error("Error loading orders:", error);
@@ -2354,6 +2434,7 @@
         document.getElementById("customerView").style.display = "none";
         document.getElementById("adminLogin").style.display = "none";
         document.getElementById("adminDashboard").style.display = "none";
+        document.getElementById("realtimeIndicator").style.display = "none";
       }
 
       function showCustomerView() {
@@ -2362,6 +2443,7 @@
         document.getElementById("customerView").style.display = "block";
         document.getElementById("adminLogin").style.display = "none";
         document.getElementById("adminDashboard").style.display = "none";
+        document.getElementById("realtimeIndicator").style.display = "flex";
 
         // Update customer info
         if (currentUser) {
@@ -2382,6 +2464,7 @@
         document.getElementById("customerView").style.display = "none";
         document.getElementById("adminLogin").style.display = "block";
         document.getElementById("adminDashboard").style.display = "none";
+        document.getElementById("realtimeIndicator").style.display = "none";
       }
 
       function showAdminDashboard() {
@@ -2391,6 +2474,7 @@
         document.getElementById("customerView").style.display = "none";
         document.getElementById("adminLogin").style.display = "none";
         document.getElementById("adminDashboard").style.display = "block";
+        document.getElementById("realtimeIndicator").style.display = "flex";
 
         loadOrders();
         renderOrders();
@@ -2422,7 +2506,7 @@
           // If status changed to "ready", show notification to customer
           if (newStatus === "ready" && oldStatus !== "ready") {
             // This will be picked up by the checkOrderStatusUpdates function
-            // on the customer's device
+            // on the customer's device through real-time updates
           }
         }
       }
