@@ -220,6 +220,24 @@
         display: block;
       }
 
+      /* Forms */
+      .auth-form {
+        max-width: 400px;
+        margin: 100px auto;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .customer-info {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
       /* Admin Dashboard */
       .admin-dashboard {
         display: none;
@@ -282,15 +300,6 @@
       }
 
       /* Login Form */
-      .login-form {
-        max-width: 400px;
-        margin: 100px auto;
-        padding: 30px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      }
-
       .form-control,
       .form-select {
         border-radius: 8px;
@@ -336,32 +345,68 @@
         border-left: 4px solid var(--success-color);
       }
 
-      /* Sync Panel */
-      .sync-panel {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: white;
-        border-radius: 12px;
-        padding: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        z-index: 1040;
-        max-width: 300px;
+      /* Sync Modal */
+      .sync-modal .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
       }
 
-      .sync-panel h6 {
-        margin-bottom: 10px;
-        color: var(--dark-color);
+      .sync-instructions {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .sync-code-area {
+        position: relative;
       }
 
       .sync-code {
         background: #f8f9fa;
-        padding: 10px;
+        border: 1px solid #dee2e6;
         border-radius: 8px;
+        padding: 15px;
         font-family: monospace;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         word-break: break-all;
+        max-height: 200px;
+        overflow-y: auto;
         margin-bottom: 10px;
+      }
+
+      .sync-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      /* File Input Styling */
+      .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .file-input-wrapper input[type="file"] {
+        position: absolute;
+        left: -9999px;
+      }
+
+      .file-input-label {
+        display: block;
+        padding: 10px 15px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s;
+      }
+
+      .file-input-label:hover {
+        background: #c82333;
       }
 
       /* Search and Filter */
@@ -402,26 +447,6 @@
       .filter-pill.active {
         background: var(--primary-color);
         color: white;
-      }
-
-      /* QR Code */
-      .qr-container {
-        text-align: center;
-        padding: 20px;
-      }
-
-      .qr-code {
-        width: 200px;
-        height: 200px;
-        margin: 0 auto;
-        background: white;
-        padding: 10px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        color: #6c757d;
       }
 
       /* Responsive */
@@ -472,11 +497,8 @@
           padding: 12px;
         }
 
-        .sync-panel {
-          bottom: 10px;
-          right: 10px;
-          left: 10px;
-          max-width: none;
+        .sync-actions {
+          flex-direction: column;
         }
       }
 
@@ -503,28 +525,10 @@
       </div>
     </div>
 
-    <!-- Sync Panel -->
-    <div class="sync-panel" id="syncPanel" style="display: none">
-      <h6><i class="bi bi-arrow-left-right me-2"></i>Sync Data</h6>
-      <div class="sync-code" id="syncCode"></div>
-      <button
-        class="btn btn-primary-custom btn-sm w-100"
-        onclick="generateSyncCode()"
-      >
-        <i class="bi bi-arrow-repeat me-2"></i>Generate Code
-      </button>
-      <button
-        class="btn btn-outline-custom btn-sm w-100 mt-2"
-        onclick="hideSyncPanel()"
-      >
-        Tutup
-      </button>
-    </div>
-
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container">
-        <a class="navbar-brand" href="#" id="brandLink">
+        <a class="navbar-brand" href="#" id="homeLink">
           <i class="bi bi-shop me-2"></i>Warung Online
         </a>
         <button
@@ -538,9 +542,6 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav me-auto">
             <li class="nav-item">
-              <a class="nav-link active" href="#" id="homeLink">Beranda</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="#" id="menuLink">Menu</a>
             </li>
             <li class="nav-item">
@@ -550,19 +551,12 @@
               <a class="nav-link" href="#" id="adminLink">Admin</a>
             </li>
           </ul>
-          <div class="d-flex align-items-center">
-            <button
-              class="btn btn-outline-light btn-sm me-2"
-              onclick="showSyncPanel()"
-              title="Sync Data"
-            >
-              <i class="bi bi-arrow-left-right"></i>
-            </button>
+          <div class="d-flex">
             <button
               class="btn btn-outline-light position-relative"
               id="cartBtn"
             >
-              <i class="bi bi-cart3 me-1"></i>Keranjang
+              <i class="bi bi-cart3"></i>
               <span class="cart-badge" id="cartBadge">0</span>
             </button>
           </div>
@@ -570,8 +564,86 @@
       </div>
     </nav>
 
+    <!-- Customer Login Form -->
+    <div id="customerLogin" class="container">
+      <div class="auth-form">
+        <div class="text-center mb-4">
+          <i
+            class="bi bi-person-circle"
+            style="font-size: 48px; color: var(--primary-color)"
+          ></i>
+          <h3 class="mt-3">Login Customer</h3>
+          <p class="text-muted">Masuk untuk memesan makanan</p>
+        </div>
+        <form id="customerLoginForm">
+          <div class="mb-3">
+            <label for="customerName" class="form-label">Nama Lengkap</label>
+            <input
+              type="text"
+              class="form-control"
+              id="customerName"
+              placeholder="Masukkan nama lengkap"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="customerPhone" class="form-label">No. Telepon</label>
+            <input
+              type="tel"
+              class="form-control"
+              id="customerPhone"
+              placeholder="Masukkan nomor telepon"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label for="customerAddress" class="form-label">Alamat</label>
+            <textarea
+              class="form-control"
+              id="customerAddress"
+              rows="3"
+              placeholder="Masukkan alamat lengkap"
+              required
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary-custom w-100">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+          </button>
+        </form>
+        <div class="text-center mt-3">
+          <small class="text-muted"
+            >Admin?
+            <a href="#" onclick="showAdminLogin()">Login di sini</a></small
+          >
+        </div>
+      </div>
+    </div>
+
     <!-- Customer View -->
-    <div id="customerView">
+    <div id="customerView" style="display: none">
+      <!-- Customer Info -->
+      <div class="container mt-3">
+        <div class="customer-info">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1">
+                Selamat datang, <span id="welcomeCustomerName"></span>
+              </h6>
+              <small class="text-muted">
+                <i class="bi bi-telephone me-1"></i>
+                <span id="welcomeCustomerPhone"></span>
+              </small>
+            </div>
+            <button
+              class="btn btn-outline-danger btn-sm"
+              onclick="customerLogout()"
+            >
+              <i class="bi bi-box-arrow-right me-1"></i>Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Hero Section -->
       <section class="hero-section">
         <div class="container hero-content">
@@ -658,9 +730,9 @@
               </button>
               <button
                 class="btn btn-outline-danger btn-sm"
-                onclick="showSyncPanel()"
+                onclick="showSyncModal()"
               >
-                <i class="bi bi-arrow-left-right me-1"></i>Sync
+                <i class="bi bi-arrow-left-right me-1"></i>Sync Data
               </button>
             </div>
           </div>
@@ -673,7 +745,7 @@
 
     <!-- Admin Login Form -->
     <div id="adminLogin" class="container" style="display: none">
-      <div class="login-form">
+      <div class="auth-form">
         <div class="text-center mb-4">
           <i
             class="bi bi-shield-lock"
@@ -682,23 +754,23 @@
           <h3 class="mt-3">Login Admin</h3>
           <p class="text-muted">Masuk untuk mengelola pesanan</p>
         </div>
-        <form id="loginForm">
+        <form id="adminLoginForm">
           <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
+            <label for="adminUsername" class="form-label">Username</label>
             <input
               type="text"
               class="form-control"
-              id="username"
+              id="adminUsername"
               placeholder="Username"
               required
             />
           </div>
           <div class="mb-4">
-            <label for="password" class="form-label">Password</label>
+            <label for="adminPassword" class="form-label">Password</label>
             <input
               type="password"
               class="form-control"
-              id="password"
+              id="adminPassword"
               placeholder="Password"
               required
             />
@@ -707,6 +779,12 @@
             <i class="bi bi-box-arrow-in-right me-2"></i>Login
           </button>
         </form>
+        <div class="text-center mt-3">
+          <small class="text-muted"
+            >Customer?
+            <a href="#" onclick="showCustomerLogin()">Login di sini</a></small
+          >
+        </div>
       </div>
     </div>
 
@@ -720,7 +798,7 @@
         <div>
           <button
             class="btn btn-outline-danger btn-sm me-2"
-            onclick="showSyncPanel()"
+            onclick="showSyncModal()"
           >
             <i class="bi bi-arrow-left-right me-1"></i>Sync Data
           </button>
@@ -845,7 +923,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title fw-bold">Form Checkout</h5>
+            <h5 class="modal-title fw-bold">Konfirmasi Pesanan</h5>
             <button
               type="button"
               class="btn-close"
@@ -853,51 +931,23 @@
             ></button>
           </div>
           <div class="modal-body">
-            <form id="checkoutForm">
-              <div class="mb-3">
-                <label for="customerName" class="form-label"
-                  >Nama Lengkap</label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="customerName"
-                  placeholder="Nama lengkap"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="customerPhone" class="form-label"
-                  >No. Telepon</label
-                >
-                <input
-                  type="tel"
-                  class="form-control"
-                  id="customerPhone"
-                  placeholder="Nomor telepon"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="customerAddress" class="form-label">Alamat</label>
-                <textarea
-                  class="form-control"
-                  id="customerAddress"
-                  rows="3"
-                  placeholder="Alamat lengkap"
-                  required
-                ></textarea>
-              </div>
-              <div class="mb-3">
-                <label for="paymentMethod" class="form-label">Pembayaran</label>
-                <select class="form-select" id="paymentMethod" required>
-                  <option value="">Pilih metode</option>
-                  <option value="cash">Cash</option>
-                  <option value="transfer">Transfer</option>
-                  <option value="ewallet">E-Wallet</option>
-                </select>
-              </div>
-            </form>
+            <div class="mb-3">
+              <label class="form-label">Metode Pembayaran</label>
+              <select class="form-select" id="paymentMethod" required>
+                <option value="">Pilih metode pembayaran</option>
+                <option value="cash">Cash (Bayar di tempat)</option>
+                <option value="transfer">Transfer Bank</option>
+                <option value="ewallet">E-Wallet</option>
+              </select>
+            </div>
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              Pesanan akan dibuat atas nama:
+              <strong id="checkoutCustomerName"></strong>
+            </div>
+            <div id="orderSummary">
+              <!-- Order summary will be dynamically inserted here -->
+            </div>
           </div>
           <div class="modal-footer">
             <button
@@ -912,7 +962,7 @@
               class="btn btn-primary-custom"
               id="confirmOrderBtn"
             >
-              <i class="bi bi-check-circle me-2"></i>Konfirmasi
+              <i class="bi bi-check-circle me-2"></i>Konfirmasi Pesanan
             </button>
           </div>
         </div>
@@ -951,6 +1001,159 @@
             </button>
             <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
               <i class="bi bi-trash me-2"></i>Hapus
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sync Modal -->
+    <div class="modal fade sync-modal" id="syncModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold">
+              <i class="bi bi-arrow-left-right me-2"></i>Sinkronisasi Data
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="sync-instructions">
+              <h6>
+                <i class="bi bi-info-circle me-2"></i>Cara Sinkronisasi Data:
+              </h6>
+              <ol>
+                <li>
+                  <strong>Export Data:</strong> Klik "Generate Sync Code" untuk
+                  membuat kode data
+                </li>
+                <li>
+                  <strong>Salin Kode:</strong> Klik "Salin Code" atau salin
+                  manual
+                </li>
+                <li>
+                  <strong>Kirim Kode:</strong> Kirim kode ke device lain
+                  (HP/Laptop)
+                </li>
+                <li>
+                  <strong>Import Data:</strong> Di device lain, paste kode di
+                  "Import from Code"
+                </li>
+                <li>
+                  <strong>Atau Upload File:</strong> Upload file JSON yang sudah
+                  diexport
+                </li>
+              </ol>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Export Data</h6>
+                <div class="sync-code-area">
+                  <div class="sync-code" id="exportCode">
+                    Klik "Generate Sync Code" terlebih dahulu
+                  </div>
+                  <div class="sync-actions">
+                    <button
+                      class="btn btn-primary-custom btn-sm flex-fill"
+                      onclick="generateSyncCode()"
+                    >
+                      <i class="bi bi-arrow-repeat me-2"></i>Generate Sync Code
+                    </button>
+                    <button
+                      class="btn btn-outline-custom btn-sm flex-fill"
+                      onclick="copySyncCode()"
+                    >
+                      <i class="bi bi-clipboard me-2"></i>Salin Code
+                    </button>
+                  </div>
+                  <div class="sync-actions">
+                    <button
+                      class="btn btn-outline-custom btn-sm flex-fill"
+                      onclick="exportToFile()"
+                    >
+                      <i class="bi bi-download me-2"></i>Export to File
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h6>Import Data</h6>
+                <div class="sync-code-area">
+                  <h6 class="mb-2">Option 1: Import from Code</h6>
+                  <textarea
+                    class="form-control"
+                    id="importCode"
+                    rows="4"
+                    placeholder="Paste sync code di sini..."
+                  ></textarea>
+                  <div class="sync-actions">
+                    <button
+                      class="btn btn-primary-custom btn-sm flex-fill"
+                      onclick="importFromCode()"
+                    >
+                      <i class="bi bi-download me-2"></i>Import from Code
+                    </button>
+                    <button
+                      class="btn btn-outline-custom btn-sm flex-fill"
+                      onclick="clearImportCode()"
+                    >
+                      <i class="bi bi-x me-2"></i>Clear
+                    </button>
+                  </div>
+                </div>
+                <div class="sync-code-area mt-3">
+                  <h6 class="mb-2">Option 2: Import from File</h6>
+                  <div class="file-input-wrapper">
+                    <label for="importFile" class="file-input-label">
+                      <i class="bi bi-upload me-2"></i>Choose JSON File
+                    </label>
+                    <input
+                      type="file"
+                      id="importFile"
+                      accept=".json"
+                      onchange="importFromFile(event)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <h6>Statistik Data:</h6>
+              <div class="row text-center">
+                <div class="col-4">
+                  <div class="fw-bold text-primary" id="totalOrdersCount">
+                    0
+                  </div>
+                  <small class="text-muted">Total Pesanan</small>
+                </div>
+                <div class="col-4">
+                  <div class="fw-bold text-success" id="totalCustomersCount">
+                    0
+                  </div>
+                  <small class="text-muted">Total Customer</small>
+                </div>
+                <div class="col-4">
+                  <div class="fw-bold text-info" id="lastSyncTime">
+                    Belum pernah
+                  </div>
+                  <small class="text-muted">Last Sync</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Tutup
             </button>
           </div>
         </div>
@@ -1029,8 +1232,10 @@
 
       let cart = [];
       let orders = [];
-      let currentView = "customer";
+      let currentView = "customerLogin";
       let isLoggedIn = false;
+      let isAdmin = false;
+      let currentUser = null;
       let orderToDelete = null;
       let currentFilter = "all";
       let searchTerm = "";
@@ -1039,14 +1244,34 @@
       document.addEventListener("DOMContentLoaded", function () {
         checkURLParams();
         loadOrders();
-        renderFoods("all");
-        updateCartBadge();
-        renderCustomerHistory();
         setupEventListeners();
 
         // Auto save every 5 seconds
         setInterval(autoSave, 5000);
+
+        // Check if user is already logged in
+        checkExistingLogin();
       });
+
+      // Check existing login
+      function checkExistingLogin() {
+        const savedUser = localStorage.getItem("warungOnlineUser");
+        if (savedUser) {
+          try {
+            currentUser = JSON.parse(savedUser);
+            if (currentUser.isAdmin) {
+              showAdminDashboard();
+            } else {
+              showCustomerView();
+            }
+          } catch (error) {
+            localStorage.removeItem("warungOnlineUser");
+            showCustomerLogin();
+          }
+        } else {
+          showCustomerLogin();
+        }
+      }
 
       // Check URL parameters for sync
       function checkURLParams() {
@@ -1056,11 +1281,11 @@
         if (syncData) {
           try {
             const decodedData = atob(syncData);
-            const importedOrders = JSON.parse(decodedData);
+            const importedData = JSON.parse(decodedData);
 
-            if (Array.isArray(importedOrders)) {
+            if (importedData.orders && Array.isArray(importedData.orders)) {
               // Merge orders, avoid duplicates
-              importedOrders.forEach((newOrder) => {
+              importedData.orders.forEach((newOrder) => {
                 const exists = orders.find((order) => order.id === newOrder.id);
                 if (!exists) {
                   orders.push(newOrder);
@@ -1087,6 +1312,7 @@
       function saveOrders() {
         try {
           localStorage.setItem("warungOnlineOrders", JSON.stringify(orders));
+          updateLastSyncTime();
         } catch (error) {
           console.error("Error saving orders:", error);
           showNotification("Gagal menyimpan data", "danger");
@@ -1112,136 +1338,256 @@
       }
 
       // Sync Functions
-      function showSyncPanel() {
-        const panel = document.getElementById("syncPanel");
-        panel.style.display = "block";
-        generateSyncCode();
-      }
-
-      function hideSyncPanel() {
-        const panel = document.getElementById("syncPanel");
-        panel.style.display = "none";
+      function showSyncModal() {
+        const modal = new bootstrap.Modal(document.getElementById("syncModal"));
+        modal.show();
+        updateSyncStats();
       }
 
       function generateSyncCode() {
         try {
-          const syncData = btoa(JSON.stringify(orders));
-          const syncCode = document.getElementById("syncCode");
-          syncCode.textContent = syncData;
+          const syncData = {
+            orders: orders,
+            timestamp: new Date().toISOString(),
+            generatedBy: currentUser ? currentUser.name : "Unknown",
+          };
 
-          // Copy to clipboard
+          const encodedData = btoa(JSON.stringify(syncData));
+          const exportCode = document.getElementById("exportCode");
+          exportCode.textContent = encodedData;
+
+          showNotification("Sync code generated!", "success");
+        } catch (error) {
+          showNotification("Gagal generate sync code", "danger");
+        }
+      }
+
+      function copySyncCode() {
+        const exportCode = document.getElementById("exportCode");
+        const text = exportCode.textContent;
+
+        if (text && text !== 'Klik "Generate Sync Code" terlebih dahulu') {
           navigator.clipboard
-            .writeText(syncData)
+            .writeText(text)
             .then(() => {
               showNotification("Code disalin ke clipboard!", "success");
             })
             .catch(() => {
-              showNotification("Salin code secara manual", "info");
+              // Fallback for older browsers
+              exportCode.select();
+              document.execCommand("copy");
+              showNotification("Code disalin (manual)", "success");
             });
+        } else {
+          showNotification("Generate sync code terlebih dahulu", "warning");
+        }
+      }
+
+      function exportToFile() {
+        try {
+          const syncData = {
+            orders: orders,
+            timestamp: new Date().toISOString(),
+            generatedBy: currentUser ? currentUser.name : "Unknown",
+          };
+
+          const dataStr = JSON.stringify(syncData, null, 2);
+          const dataBlob = new Blob([dataStr], { type: "application/json" });
+          const url = URL.createObjectURL(dataBlob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `warung-online-orders-${
+            new Date().toISOString().split("T")[0]
+          }.json`;
+          link.click();
+          URL.revokeObjectURL(url);
+
+          showNotification("File berhasil diexport!", "success");
         } catch (error) {
-          showNotification("Gagal generate code", "danger");
+          showNotification("Gagal export file", "danger");
         }
       }
 
       function importFromCode() {
-        const code = prompt("Masukkan sync code:");
-        if (code) {
-          try {
-            const decodedData = atob(code);
-            const importedOrders = JSON.parse(decodedData);
+        const importCode = document.getElementById("importCode").value.trim();
 
-            if (Array.isArray(importedOrders)) {
-              // Merge orders, avoid duplicates
-              importedOrders.forEach((newOrder) => {
-                const exists = orders.find((order) => order.id === newOrder.id);
-                if (!exists) {
-                  orders.push(newOrder);
-                }
-              });
+        if (!importCode) {
+          showNotification("Masukkan sync code terlebih dahulu", "warning");
+          return;
+        }
 
+        try {
+          const decodedData = atob(importCode);
+          const importedData = JSON.parse(decodedData);
+
+          if (importedData.orders && Array.isArray(importedData.orders)) {
+            let importedCount = 0;
+
+            // Merge orders, avoid duplicates
+            importedData.orders.forEach((newOrder) => {
+              const exists = orders.find((order) => order.id === newOrder.id);
+              if (!exists) {
+                orders.push(newOrder);
+                importedCount++;
+              }
+            });
+
+            if (importedCount > 0) {
               saveOrders();
 
               if (currentView === "admin") {
                 renderOrders();
-              } else {
+              } else if (currentView === "customer") {
                 renderCustomerHistory();
               }
 
-              showNotification("Data berhasil diimpor!", "success");
+              showNotification(
+                `Berhasil mengimpor ${importedCount} pesanan!`,
+                "success"
+              );
+              updateSyncStats();
             } else {
-              showNotification("Format data tidak valid", "danger");
+              showNotification("Tidak ada data baru yang diimpor", "info");
             }
-          } catch (error) {
-            showNotification("Code tidak valid", "danger");
+          } else {
+            showNotification("Format data tidak valid", "danger");
           }
+        } catch (error) {
+          showNotification("Sync code tidak valid", "danger");
+          console.error("Import error:", error);
         }
       }
 
-      function shareSyncLink() {
-        try {
-          const syncData = btoa(JSON.stringify(orders));
-          const currentURL = window.location.origin + window.location.pathname;
-          const shareURL = `${currentURL}?sync=${encodeURIComponent(syncData)}`;
+      function importFromFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-          if (navigator.share) {
-            navigator.share({
-              title: "Warung Online - Sync Data",
-              text: "Klik link untuk sync data pesanan",
-              url: shareURL,
-            });
-          } else {
-            // Fallback: copy to clipboard
-            navigator.clipboard
-              .writeText(shareURL)
-              .then(() => {
-                showNotification("Link disalin ke clipboard!", "success");
-              })
-              .catch(() => {
-                // Fallback: show in prompt
-                prompt("Salin link ini:", shareURL);
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            const importedData = JSON.parse(e.target.result);
+
+            if (importedData.orders && Array.isArray(importedData.orders)) {
+              let importedCount = 0;
+
+              // Merge orders, avoid duplicates
+              importedData.orders.forEach((newOrder) => {
+                const exists = orders.find((order) => order.id === newOrder.id);
+                if (!exists) {
+                  orders.push(newOrder);
+                  importedCount++;
+                }
               });
+
+              if (importedCount > 0) {
+                saveOrders();
+
+                if (currentView === "admin") {
+                  renderOrders();
+                } else if (currentView === "customer") {
+                  renderCustomerHistory();
+                }
+
+                showNotification(
+                  `Berhasil mengimpor ${importedCount} pesanan dari file!`,
+                  "success"
+                );
+                updateSyncStats();
+              } else {
+                showNotification("Tidak ada data baru yang diimpor", "info");
+              }
+            } else {
+              showNotification("Format file tidak valid", "danger");
+            }
+          } catch (error) {
+            showNotification("Gagal membaca file", "danger");
+            console.error("File import error:", error);
           }
-        } catch (error) {
-          showNotification("Gagal membuat link sync", "danger");
+        };
+        reader.readAsText(file);
+        // Reset file input
+        event.target.value = "";
+      }
+
+      function clearImportCode() {
+        document.getElementById("importCode").value = "";
+      }
+
+      function updateSyncStats() {
+        document.getElementById("totalOrdersCount").textContent = orders.length;
+
+        const uniqueCustomers = new Set(orders.map((order) => order.customerId))
+          .size;
+        document.getElementById("totalCustomersCount").textContent =
+          uniqueCustomers;
+
+        const lastSync = localStorage.getItem("warungOnlineLastSync");
+        if (lastSync) {
+          const date = new Date(lastSync);
+          document.getElementById("lastSyncTime").textContent =
+            date.toLocaleString("id-ID");
         }
+      }
+
+      function updateLastSyncTime() {
+        localStorage.setItem("warungOnlineLastSync", new Date().toISOString());
       }
 
       // Event Listeners
       function setupEventListeners() {
-        // Navigation
+        // Customer login form
         document
-          .getElementById("homeLink")
-          .addEventListener("click", showCustomerView);
-        document.getElementById("menuLink").addEventListener("click", () => {
-          showCustomerView();
-          document
-            .getElementById("menuSection")
-            .scrollIntoView({ behavior: "smooth" });
+          .getElementById("customerLoginForm")
+          .addEventListener("submit", handleCustomerLogin);
+
+        // Admin login form
+        document
+          .getElementById("adminLoginForm")
+          .addEventListener("submit", handleAdminLogin);
+
+        // Navigation
+        document.getElementById("homeLink")?.addEventListener("click", () => {
+          if (isAdmin) showAdminDashboard();
+          else if (currentUser) showCustomerView();
         });
-        document.getElementById("historyLink").addEventListener("click", () => {
-          showCustomerView();
-          document
-            .getElementById("historySection")
-            .scrollIntoView({ behavior: "smooth" });
+
+        document.getElementById("menuLink")?.addEventListener("click", () => {
+          if (isAdmin) showAdminDashboard();
+          else if (currentUser) {
+            showCustomerView();
+            document
+              .getElementById("menuSection")
+              .scrollIntoView({ behavior: "smooth" });
+          }
         });
+
+        document
+          .getElementById("historyLink")
+          ?.addEventListener("click", () => {
+            if (isAdmin) showAdminDashboard();
+            else if (currentUser) {
+              showCustomerView();
+              document
+                .getElementById("historySection")
+                .scrollIntoView({ behavior: "smooth" });
+            }
+          });
+
         document
           .getElementById("adminLink")
-          .addEventListener("click", showAdminLogin);
-        document
-          .getElementById("brandLink")
-          .addEventListener("click", showCustomerView);
+          ?.addEventListener("click", showAdminLogin);
 
         // Cart
-        document.getElementById("cartBtn").addEventListener("click", showCart);
+        document.getElementById("cartBtn")?.addEventListener("click", showCart);
         document
           .getElementById("closeCartBtn")
-          .addEventListener("click", hideCart);
+          ?.addEventListener("click", hideCart);
         document
           .getElementById("cartOverlay")
-          .addEventListener("click", hideCart);
+          ?.addEventListener("click", hideCart);
         document
           .getElementById("checkoutBtn")
-          .addEventListener("click", showCheckoutModal);
+          ?.addEventListener("click", showCheckoutModal);
 
         // Category filter
         document.querySelectorAll(".category-btn").forEach((btn) => {
@@ -1256,19 +1602,16 @@
 
         // Admin
         document
-          .getElementById("loginForm")
-          .addEventListener("submit", handleLogin);
-        document
           .getElementById("logoutBtn")
-          .addEventListener("click", handleLogout);
+          ?.addEventListener("click", handleLogout);
         document
           .getElementById("refreshBtn")
-          .addEventListener("click", refreshOrders);
+          ?.addEventListener("click", refreshOrders);
 
         // Search and filter
         document
           .getElementById("searchInput")
-          .addEventListener("input", function (e) {
+          ?.addEventListener("input", function (e) {
             searchTerm = e.target.value.toLowerCase();
             renderOrders();
           });
@@ -1287,12 +1630,12 @@
         // Checkout
         document
           .getElementById("confirmOrderBtn")
-          .addEventListener("click", handleCheckout);
+          ?.addEventListener("click", handleCheckout);
 
         // Delete confirmation
         document
           .getElementById("confirmDeleteBtn")
-          .addEventListener("click", confirmDeleteOrder);
+          ?.addEventListener("click", confirmDeleteOrder);
       }
 
       // Render Functions
@@ -1420,8 +1763,8 @@
                     <div class="text-center py-4">
                         <i class="bi bi-inbox" style="font-size: 48px; color: #dee2e6;"></i>
                         <p class="mt-2 text-muted">Tidak ada pesanan</p>
-                        <button class="btn btn-outline-danger btn-sm mt-2" onclick="importFromCode()">
-                            <i class="bi bi-download me-1"></i>Import Data
+                        <button class="btn btn-outline-danger btn-sm mt-2" onclick="showSyncModal()">
+                            <i class="bi bi-arrow-left-right me-1"></i>Import Data
                         </button>
                     </div>
                 `;
@@ -1514,7 +1857,7 @@
                                           order.status === "ready"
                                             ? "selected"
                                             : ""
-                                        }>Siap</option>
+                                        }>Siap Diambil</option>
                                         <option value="completed" ${
                                           order.status === "completed"
                                             ? "selected"
@@ -1542,17 +1885,31 @@
       function renderCustomerHistory() {
         const historyContainer = document.getElementById("customerHistory");
 
-        if (orders.length === 0) {
+        if (!currentUser) {
           historyContainer.innerHTML = `
                     <div class="text-center py-4">
-                        <i class="bi bi-clock-history" style="font-size: 48px; color: #dee2e6;"></i>
-                        <p class="mt-2 text-muted">Belum ada riwayat</p>
+                        <i class="bi bi-person-x" style="font-size: 48px; color: #dee2e6;"></i>
+                        <p class="mt-2 text-muted">Silakan login terlebih dahulu</p>
                     </div>
                 `;
           return;
         }
 
-        historyContainer.innerHTML = orders
+        const customerOrders = orders.filter(
+          (order) => order.customerId === currentUser.id
+        );
+
+        if (customerOrders.length === 0) {
+          historyContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="bi bi-clock-history" style="font-size: 48px; color: #dee2e6;"></i>
+                        <p class="mt-2 text-muted">Belum ada riwayat pesanan</p>
+                    </div>
+                `;
+          return;
+        }
+
+        historyContainer.innerHTML = customerOrders
           .map(
             (order) => `
                 <div class="history-item">
@@ -1613,6 +1970,11 @@
 
       // Cart Functions
       function addToCart(foodId) {
+        if (!currentUser) {
+          showNotification("Silakan login terlebih dahulu", "warning");
+          return;
+        }
+
         const food = foods.find((f) => f.id === foodId);
         const existingItem = cart.find((item) => item.id === foodId);
 
@@ -1666,10 +2028,50 @@
       }
 
       function showCheckoutModal() {
+        if (!currentUser) {
+          showNotification("Silakan login terlebih dahulu", "warning");
+          return;
+        }
+
         if (cart.length === 0) {
           showNotification("Keranjang kosong!", "warning");
           return;
         }
+
+        // Set customer name in checkout modal
+        document.getElementById("checkoutCustomerName").textContent =
+          currentUser.name;
+
+        // Show order summary
+        const orderSummary = document.getElementById("orderSummary");
+        const total = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+
+        orderSummary.innerHTML = `
+                <div class="bg-light p-3 rounded">
+                    <h6 class="fw-bold mb-2">Ringkasan Pesanan:</h6>
+                    ${cart
+                      .map(
+                        (item) => `
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>${item.name} x${item.quantity}</span>
+                            <span>Rp ${(
+                              item.price * item.quantity
+                            ).toLocaleString("id-ID")}</span>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold">
+                        <span>Total:</span>
+                        <span>Rp ${total.toLocaleString("id-ID")}</span>
+                    </div>
+                </div>
+            `;
+
         const modal = new bootstrap.Modal(
           document.getElementById("checkoutModal")
         );
@@ -1677,18 +2079,19 @@
       }
 
       function handleCheckout() {
-        const form = document.getElementById("checkoutForm");
-        if (!form.checkValidity()) {
-          form.reportValidity();
+        const paymentMethod = document.getElementById("paymentMethod").value;
+        if (!paymentMethod) {
+          showNotification("Pilih metode pembayaran", "warning");
           return;
         }
 
         const order = {
           id: Date.now(),
-          customerName: document.getElementById("customerName").value,
-          customerPhone: document.getElementById("customerPhone").value,
-          customerAddress: document.getElementById("customerAddress").value,
-          paymentMethod: document.getElementById("paymentMethod").value,
+          customerId: currentUser.id,
+          customerName: currentUser.name,
+          customerPhone: currentUser.phone,
+          customerAddress: currentUser.address,
+          paymentMethod: paymentMethod,
           items: [...cart],
           total: cart.reduce(
             (sum, item) => sum + item.price * item.quantity,
@@ -1710,21 +2113,105 @@
         );
         modal.hide();
 
-        form.reset();
-        showNotification("Pesanan berhasil!", "success");
+        document.getElementById("paymentMethod").value = "";
+        showNotification("Pesanan berhasil dibuat!", "success");
         renderCustomerHistory();
       }
 
+      // Authentication Functions
+      function handleCustomerLogin(e) {
+        e.preventDefault();
+
+        const name = document.getElementById("customerName").value;
+        const phone = document.getElementById("customerPhone").value;
+        const address = document.getElementById("customerAddress").value;
+
+        currentUser = {
+          id: "customer_" + Date.now(),
+          name: name,
+          phone: phone,
+          address: address,
+          isAdmin: false,
+        };
+
+        // Save to localStorage
+        localStorage.setItem("warungOnlineUser", JSON.stringify(currentUser));
+
+        showCustomerView();
+        showNotification(`Selamat datang, ${name}!`, "success");
+      }
+
+      function handleAdminLogin(e) {
+        e.preventDefault();
+
+        const username = document.getElementById("adminUsername").value;
+        const password = document.getElementById("adminPassword").value;
+
+        if (username === "admin" && password === "admin123") {
+          currentUser = {
+            id: "admin_" + Date.now(),
+            name: "Admin",
+            phone: "-",
+            address: "-",
+            isAdmin: true,
+          };
+
+          localStorage.setItem("warungOnlineUser", JSON.stringify(currentUser));
+
+          showAdminDashboard();
+          showNotification("Login admin berhasil!", "success");
+        } else {
+          showNotification("Username atau password salah!", "danger");
+        }
+      }
+
+      function customerLogout() {
+        currentUser = null;
+        localStorage.removeItem("warungOnlineUser");
+        showCustomerLogin();
+        showNotification("Logout berhasil!", "info");
+      }
+
+      function handleLogout() {
+        currentUser = null;
+        isAdmin = false;
+        localStorage.removeItem("warungOnlineUser");
+        showCustomerLogin();
+        showNotification("Logout berhasil!", "info");
+      }
+
       // View Functions
-      function showCustomerView() {
-        currentView = "customer";
-        document.getElementById("customerView").style.display = "block";
+      function showCustomerLogin() {
+        currentView = "customerLogin";
+        document.getElementById("customerLogin").style.display = "block";
+        document.getElementById("customerView").style.display = "none";
         document.getElementById("adminLogin").style.display = "none";
         document.getElementById("adminDashboard").style.display = "none";
       }
 
+      function showCustomerView() {
+        currentView = "customer";
+        document.getElementById("customerLogin").style.display = "none";
+        document.getElementById("customerView").style.display = "block";
+        document.getElementById("adminLogin").style.display = "none";
+        document.getElementById("adminDashboard").style.display = "none";
+
+        // Update customer info
+        if (currentUser) {
+          document.getElementById("welcomeCustomerName").textContent =
+            currentUser.name;
+          document.getElementById("welcomeCustomerPhone").textContent =
+            currentUser.phone;
+        }
+
+        // Render foods menu
+        renderFoods("all");
+        renderCustomerHistory();
+      }
+
       function showAdminLogin() {
-        currentView = "login";
+        currentView = "adminLogin";
+        document.getElementById("customerLogin").style.display = "none";
         document.getElementById("customerView").style.display = "none";
         document.getElementById("adminLogin").style.display = "block";
         document.getElementById("adminDashboard").style.display = "none";
@@ -1732,6 +2219,8 @@
 
       function showAdminDashboard() {
         currentView = "admin";
+        isAdmin = true;
+        document.getElementById("customerLogin").style.display = "none";
         document.getElementById("customerView").style.display = "none";
         document.getElementById("adminLogin").style.display = "none";
         document.getElementById("adminDashboard").style.display = "block";
@@ -1741,26 +2230,6 @@
       }
 
       // Admin Functions
-      function handleLogin(e) {
-        e.preventDefault();
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-
-        if (username === "admin" && password === "admin123") {
-          isLoggedIn = true;
-          showAdminDashboard();
-          showNotification("Login berhasil!", "success");
-        } else {
-          showNotification("Username/password salah!", "danger");
-        }
-      }
-
-      function handleLogout() {
-        isLoggedIn = false;
-        showCustomerView();
-        showNotification("Logout berhasil!", "info");
-      }
-
       function refreshOrders() {
         loadOrders();
         renderOrders();
@@ -1780,7 +2249,7 @@
           saveOrders();
           renderOrders();
           renderCustomerHistory();
-          showNotification("Status diperbarui!", "success");
+          showNotification("Status pesanan diperbarui!", "success");
         }
       }
 
@@ -1788,7 +2257,7 @@
         const statusMap = {
           pending: "Menunggu",
           processing: "Diproses",
-          ready: "Siap",
+          ready: "Siap Diambil",
           completed: "Selesai",
         };
         return statusMap[status] || status;
