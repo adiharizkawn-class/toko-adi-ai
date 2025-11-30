@@ -292,11 +292,24 @@
       .status-ready {
         background: #d4edda;
         color: #155724;
+        animation: pulse 2s infinite;
       }
 
       .status-completed {
         background: #e2e3e5;
         color: #383d41;
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+        }
       }
 
       /* Login Form */
@@ -328,6 +341,25 @@
         padding: 15px;
         margin-bottom: 10px;
         border-left: 3px solid var(--primary-color);
+        transition: all 0.3s ease;
+      }
+
+      .history-item.ready-order {
+        background: #d4edda;
+        border-left-color: #28a745;
+        animation: highlight 3s ease;
+      }
+
+      @keyframes highlight {
+        0% {
+          background-color: #f8f9fa;
+        }
+        50% {
+          background-color: #d4edda;
+        }
+        100% {
+          background-color: #d4edda;
+        }
       }
 
       /* Notification */
@@ -343,6 +375,32 @@
         z-index: 1060;
         display: none;
         border-left: 4px solid var(--success-color);
+      }
+
+      .order-ready-notification {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(40, 167, 69, 0.3);
+        z-index: 1070;
+        display: none;
+        max-width: 350px;
+        animation: slideIn 0.5s ease, pulse 2s infinite;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
       }
 
       /* Sync Modal */
@@ -500,6 +558,12 @@
         .sync-actions {
           flex-direction: column;
         }
+
+        .order-ready-notification {
+          right: 10px;
+          left: 10px;
+          max-width: none;
+        }
       }
 
       @media (max-width: 576px) {
@@ -522,6 +586,19 @@
       <div class="d-flex align-items-center">
         <i class="bi bi-check-circle-fill me-2"></i>
         <span id="notificationText"></span>
+      </div>
+    </div>
+
+    <!-- Order Ready Notification -->
+    <div class="order-ready-notification" id="orderReadyNotification">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-bell-fill me-3" style="font-size: 24px"></i>
+        <div>
+          <h6 class="mb-1 fw-bold">Pesanan Siap Diambil!</h6>
+          <p class="mb-0" id="orderReadyText">
+            Pesanan Anda sudah siap diambil.
+          </p>
+        </div>
       </div>
     </div>
 
@@ -1166,18 +1243,18 @@
       const foods = [
         {
           id: 1,
-          name: "Soto Ayam",
-          category: "soto",
+          name: "Dimsun Mentai",
+          category: "Dimsum",
           price: 20000,
-          image: "https://picsum.photos/seed/soto1/300/200",
-          description: "Soto ayam dengan kuah gurih",
+          image: "shopping.webp",
+          description: "dimsum dengan kuah gurih",
         },
         {
           id: 2,
           name: "Soto Daging",
           category: "soto",
           price: 25000,
-          image: "https://picsum.photos/seed/soto2/300/200",
+          image: "photo.jpg",
           description: "Soto daging sapi dengan rempah",
         },
         {
@@ -1185,7 +1262,7 @@
           name: "Bakso Urat",
           category: "bakso",
           price: 15000,
-          image: "https://picsum.photos/seed/bakso1/300/200",
+          image: "images.jpeg",
           description: "Bakso urat kenyal",
         },
         {
@@ -1193,7 +1270,8 @@
           name: "Bakso Beranak",
           category: "bakso",
           price: 20000,
-          image: "https://picsum.photos/seed/bakso2/300/200",
+          image:
+            "e0dec419-e955-47df-bc46-69606aec6577_Go-Biz_20250116_145449.jpeg",
           description: "Bakso besar berisi telur",
         },
         {
@@ -1201,15 +1279,15 @@
           name: "Mie Ayam",
           category: "mie",
           price: 18000,
-          image: "https://picsum.photos/seed/mie1/300/200",
+          image: "hq720.jpg",
           description: "Mie ayam dengan topping",
         },
         {
           id: 6,
-          name: "Mie Jamur",
-          category: "mie",
+          name: " Jamur",
+          category: "jamur",
           price: 17000,
-          image: "https://picsum.photos/seed/mie2/300/200",
+          image: "5f73528912598.jpg",
           description: "Mie ayam dengan jamur",
         },
         {
@@ -1217,7 +1295,7 @@
           name: "Kebab Turki",
           category: "kebab",
           price: 22000,
-          image: "https://picsum.photos/seed/kebab1/300/200",
+          image: "kebab_rumahan_ekonomis.jpg",
           description: "Kebab dengan daging sapi",
         },
         {
@@ -1225,7 +1303,8 @@
           name: "Kebab Keju",
           category: "kebab",
           price: 25000,
-          image: "https://picsum.photos/seed/kebab2/300/200",
+          image:
+            "e362433d-0a5f-42f9-8abc-b990bd5c0f41_Go-Biz_20210423_170729.webp",
           description: "Kebab dengan keju mozarella",
         },
       ];
@@ -1239,6 +1318,7 @@
       let orderToDelete = null;
       let currentFilter = "all";
       let searchTerm = "";
+      let lastNotifiedOrders = new Set(); // Track orders that have been notified
 
       // Initialize
       document.addEventListener("DOMContentLoaded", function () {
@@ -1248,6 +1328,9 @@
 
         // Auto save every 5 seconds
         setInterval(autoSave, 5000);
+
+        // Check for order status updates every 3 seconds
+        setInterval(checkOrderStatusUpdates, 3000);
 
         // Check if user is already logged in
         checkExistingLogin();
@@ -1306,6 +1389,86 @@
             console.error("Error parsing sync data:", error);
           }
         }
+      }
+
+      // Check for order status updates
+      function checkOrderStatusUpdates() {
+        if (!currentUser || currentUser.isAdmin) return;
+
+        const customerOrders = orders.filter(
+          (order) => order.customerId === currentUser.id
+        );
+
+        customerOrders.forEach((order) => {
+          // Check if order is ready and hasn't been notified yet
+          if (order.status === "ready" && !lastNotifiedOrders.has(order.id)) {
+            showOrderReadyNotification(order);
+            lastNotifiedOrders.add(order.id);
+
+            // Highlight the order in history
+            highlightOrderInHistory(order.id);
+          }
+        });
+      }
+
+      // Show order ready notification
+      function showOrderReadyNotification(order) {
+        const notification = document.getElementById("orderReadyNotification");
+        const orderReadyText = document.getElementById("orderReadyText");
+
+        orderReadyText.textContent = `Pesanan #${order.id} Anda sudah siap diambil!`;
+
+        notification.style.display = "block";
+
+        // Play notification sound if available
+        playNotificationSound();
+
+        // Auto hide after 10 seconds
+        setTimeout(() => {
+          notification.style.display = "none";
+        }, 10000);
+      }
+
+      // Play notification sound
+      function playNotificationSound() {
+        try {
+          // Create audio context for notification sound
+          const audioContext = new (window.AudioContext ||
+            window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.frequency.value = 800;
+          oscillator.type = "sine";
+
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 0.5
+          );
+
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (e) {
+          console.log("Could not play notification sound");
+        }
+      }
+
+      // Highlight order in history
+      function highlightOrderInHistory(orderId) {
+        const historyItems = document.querySelectorAll(".history-item");
+        historyItems.forEach((item) => {
+          const orderNumber = item.querySelector("h6");
+          if (orderNumber && orderNumber.textContent.includes(`#${orderId}`)) {
+            item.classList.add("ready-order");
+
+            // Scroll to the order if it's not visible
+            item.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
       }
 
       // Storage Functions
@@ -1912,7 +2075,9 @@
         historyContainer.innerHTML = customerOrders
           .map(
             (order) => `
-                <div class="history-item">
+                <div class="history-item ${
+                  order.status === "ready" ? "ready-order" : ""
+                }" data-order-id="${order.id}">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -2167,6 +2332,7 @@
 
       function customerLogout() {
         currentUser = null;
+        lastNotifiedOrders.clear(); // Clear notified orders on logout
         localStorage.removeItem("warungOnlineUser");
         showCustomerLogin();
         showNotification("Logout berhasil!", "info");
@@ -2175,6 +2341,7 @@
       function handleLogout() {
         currentUser = null;
         isAdmin = false;
+        lastNotifiedOrders.clear(); // Clear notified orders on logout
         localStorage.removeItem("warungOnlineUser");
         showCustomerLogin();
         showNotification("Logout berhasil!", "info");
@@ -2245,11 +2412,18 @@
       function updateOrderStatus(orderId, newStatus) {
         const order = orders.find((o) => o.id === orderId);
         if (order) {
+          const oldStatus = order.status;
           order.status = newStatus;
           saveOrders();
           renderOrders();
           renderCustomerHistory();
           showNotification("Status pesanan diperbarui!", "success");
+
+          // If status changed to "ready", show notification to customer
+          if (newStatus === "ready" && oldStatus !== "ready") {
+            // This will be picked up by the checkOrderStatusUpdates function
+            // on the customer's device
+          }
         }
       }
 
